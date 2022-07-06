@@ -1,7 +1,6 @@
 <script lang="ts">
+  import Input from "./Input.svelte";
   import List from "./List.svelte";
-
-  let task: string = "";
 
   let taskList: {
     id: number;
@@ -12,15 +11,18 @@
     { id: 2, taskName: "Do Sqlite" },
   ];
 
-  const addTask = () => {
+  const handleSubmit = (event) => {
+    addTask(event.detail.text);
+  };
+
+  const addTask = (task: string) => {
     if (task === "") return;
     taskList = [...taskList, { id: taskList.length, taskName: task }];
     task = "";
   };
 </script>
 
-<input id="taskInput" bind:value={task} placeholder="Add a task" />
-<button htmlfor="taskInput" on:click={addTask}>Add Task</button>
+<Input on:submit={handleSubmit} />
 
 <List {taskList} />
 

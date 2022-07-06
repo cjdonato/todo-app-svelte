@@ -1,12 +1,20 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
+
+  let task: string = "";
+
+  const addTask = () => {
+    dispatch('submit', {
+      text: task
+    });
+  }
 </script>
 
-<label htmlfor="task"
-  >Add a task
-  <input type="text" id="task" name="task" value="" /><br />
-</label><br />
+<input id="taskInput" bind:value={task} placeholder="Task name" />
 
-<input type="submit" value="Add" />
+<button htmlfor="taskInput" on:click={addTask}>Add Task</button>
 
 <style>
 </style>
