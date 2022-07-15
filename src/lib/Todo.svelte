@@ -1,30 +1,69 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import axios from "axios";
+
   import Input from "./Input.svelte";
   import List from "./List.svelte";
 
   let taskList: {
     id: number;
-    taskName: string;
-  }[] = [
-    { id: 0, taskName: "Do Svelte" },
-    { id: 1, taskName: "Do Express" },
-    { id: 2, taskName: "Do Sqlite" },
-  ];
+    name: string;
+    isDone: boolean;
+  }[] = [];
 
-  const handleSubmit = (event) => {
-    addTask(event.detail.text);
+  onMount(async () => {
+    try {
+      const res = await axios.get(`http://localhost:3001/todo`);
+      taskList = res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  const handleSubmit = async (event: CustomEvent<any>) => {
+    await addTask(event.detail.text);
   };
 
-  const addTask = (task: string) => {
+  const handleFinish = async (event: CustomEvent<any>) => {
+    await finishTask(event.detail.id);
+  };
+
+  const handleDelete = async (event: CustomEvent<any>) => {
+    await deleteTask(event.detail.id);
+  };
+
+  const addTask = async (task: string) => {
     if (task === "") return;
-    taskList = [...taskList, { id: taskList.length, taskName: task }];
+
+    const res = await axios.post(`http://localhost:3001/todo`, {
+      name: task,
+    });
+
+    taskList = [...taskList, res.data];
     task = "";
+  };
+
+  const finishTask = async (id: number) => {
+    const res = await axios.put(`http://localhost:3001/todo`, {
+      id,
+      isDone: true,
+    });
+
+    taskList = taskList.map((task) => (task.id === id ? res.data : task));
+  };
+
+  const deleteTask = async (id: number) => {
+    const res = await axios.delete(`http://localhost:3001/todo`, {
+      data: { id },
+    });
+
+    taskList = taskList.filter((task) => task.id !== res.data.id);
   };
 </script>
 
 <Input on:submit={handleSubmit} />
 
-<List {taskList} />
+<List {taskList} on:finish={handleFinish} on:delete={handleDelete} />
 
 <style>
 </style>
