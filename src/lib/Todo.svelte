@@ -11,9 +11,13 @@
     isDone: boolean;
   }[] = [];
 
+  const api_url = import.meta.env.PROD
+    ? "https://todo-api-wwxi4zjszq-ew.a.run.app/todo"
+    : "http://localhost:3001/todo";
+
   onMount(async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/todo`);
+      const res = await axios.get(api_url);
       taskList = res.data;
     } catch (error) {
       console.log(error);
@@ -35,7 +39,7 @@
   const addTask = async (task: string) => {
     if (task === "") return;
 
-    const res = await axios.post(`http://localhost:3001/todo`, {
+    const res = await axios.post(api_url, {
       name: task,
     });
 
@@ -44,7 +48,7 @@
   };
 
   const finishTask = async (id: number) => {
-    const res = await axios.put(`http://localhost:3001/todo`, {
+    const res = await axios.put(api_url, {
       id,
       isDone: true,
     });
@@ -53,7 +57,7 @@
   };
 
   const deleteTask = async (id: number) => {
-    const res = await axios.delete(`http://localhost:3001/todo`, {
+    const res = await axios.delete(api_url, {
       data: { id },
     });
 
